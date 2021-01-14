@@ -8,6 +8,7 @@ package org.woon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
@@ -354,13 +355,19 @@ public class BookingDetailsDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        if (!inputValid()) {
-            JOptionPane.showMessageDialog(this, "Input(s) invalid! Please re-check the inputs.", "Error", JOptionPane.WARNING_MESSAGE);
+        ArrayList<String> inputErrors = checkErrors();
+        if (inputErrors.size() > 0) {
+            // How to join array
+            // https://stackoverflow.com/questions/599161/best-way-to-convert-an-arraylist-to-a-string
+
+            String errorMessage = String.join("\n", inputErrors);
+            JOptionPane.showMessageDialog(this, "There are input errors:\n" + errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
         CustomerData newCustomer = new CustomerData(
                 txtCustomerFName.getText().trim(), txtCustomerLName.getText().trim(),
-                txtIdentityCard.getText().trim(), txtContactNumber.getText().trim(),
+                txtIdentityCard.getText().toUpperCase().trim(), txtContactNumber.getText().trim(),
                 txtEmail.getText().trim()
         );
 
@@ -401,6 +408,38 @@ public class BookingDetailsDialog extends javax.swing.JDialog {
         MenuFrame.refreshTable();
         this.dispose();
     }//GEN-LAST:event_btnSaveActionPerformed
+
+    private ArrayList<String> checkErrors() {
+        ArrayList<String> listOfErrors = new ArrayList<>();
+
+        if (txtCustomerFName.getText().trim().isBlank()
+                || txtCustomerLName.getText().trim().isBlank()
+                || txtIdentityCard.getText().trim().isBlank()
+                || txtContactNumber.getText().trim().isBlank()
+                || txtEmail.getText().trim().isBlank()) {
+            listOfErrors.add("Please fill up all fields!");
+            return listOfErrors;
+        } else {
+
+            // how to regex passport number
+            // https://stackoverflow.com/questions/40647728/regex-for-passport-number
+            if (!txtIdentityCard.getText().trim().toUpperCase().matches("^[A-Z]{1,3}\\d+(\\w|)$") && !txtIdentityCard.getText().matches("^\\d{6}(-|)\\d{2}(-|)\\d{4}$")) {
+                listOfErrors.add("Passport/IC number is invalid!");
+            }
+
+            if (!txtContactNumber.getText().trim().matches("^(01)\\d-\\d{7,8}$")) {
+                listOfErrors.add("Contact number must follow the format: 01X-XXXXXXX!");
+            }
+
+            // Email regex
+            // https://regexr.com/2ri2c
+            if (!txtEmail.getText().trim().matches("\\b[\\w\\.-]+@[\\w\\.-]+\\.\\w{2,4}\\b")) {
+                listOfErrors.add("Email provided is in invalid format!");
+            }
+
+            return listOfErrors;
+        }
+    }
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         if (isChangesMade) {
