@@ -375,10 +375,10 @@ public class AddBookingDialog extends javax.swing.JDialog {
         receipt.setVisible(true);
 
         if (receipt.getResponse() == false) {
-            JOptionPane.showConfirmDialog(this, "Payment cancelled.", "Info", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(this, "Payment cancelled.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         } else {
-            JOptionPane.showConfirmDialog(this, "Payment successful.", "Success", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(this, "Payment successful.", "Success", JOptionPane.INFORMATION_MESSAGE);
         }
 
         MenuFrame.bookings.add(newBookingData);
